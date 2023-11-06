@@ -9,6 +9,9 @@ const carsRight = document.querySelectorAll('.car-right')
 
 let currentIndex = 76
 const width = 9
+let timerId
+let currentTime = 20
+let outcomeTimerId
 
 function moveFrog(e) {
 
@@ -32,10 +35,16 @@ function moveFrog(e) {
 document.addEventListener('keyup', moveFrog)
 
 function autoMoveElements() {
+    currentTime--
+    timeLeftDisplay.textContent = currentTime
     logsleft.forEach(logLeft => moveLogLeft(logLeft)) 
     logsRight.forEach(logRight => moveLogRight(logRight))
     carsLeft.forEach(carLeft => moveCarLeft(carLeft))
     carsRight.forEach(carRight => moveCarRight(carRight))
+}
+function checkOutcomes(){
+    lose()
+    win()
 }
 
 function moveLogLeft(logLeft) {
@@ -122,4 +131,41 @@ function moveCarRight(carRight){
     }
 }
 
-setInterval(autoMoveElements, 1000)
+function lose(){
+    console.log(squares[currentIndex].classList)
+    if(
+        squares[currentIndex].classList.contains('c1') ||
+        squares[currentIndex].classList.contains('l4') ||
+        squares[currentIndex].classList.contains('l5') ||
+        currentTime <= 0 
+        
+    ) {
+        resultDisplay.textContent = 'You Loose!'
+        clearInterval(timerId)
+        clearInterval(outcomeTimerId)
+        squares[currentIndex].classList.remove('frog')
+        document.removeEventListener('keyup', moveFrog)
+    }
+}
+
+function win() {
+    if ( squares[currentIndex].classList.contains('ending-block') ) {
+        resultDisplay.textContent = 'You Win!'
+        clearInterval(timerId)
+        clearInterval(outcomeTimerId)
+        document.removeEventListener('keyup', moveFrog)
+    }
+}
+
+startPauseButton.addEventListener('click', () => {
+    if(timerId) {
+        clearInterval(timerId)
+        clearInterval(outcomeTimerId)
+        timerId = null
+        document.removeEventListener('keyup', moveFrog)
+    } else {
+        timerId = setInterval(autoMoveElements, 1000)
+        outcomeTimerId = setInterval(checkOutcomes, 50)
+        document.addEventListener('keyup', moveFrog)
+    }
+})
